@@ -1,0 +1,63 @@
+######## start msgr.ru ########
+<< http://msgr.ru/ru/auction/26-fevrala-2020-goda
+<< http://www.msgr.ru/ru/result/2017-08-23
+<< http://www.msgr.ru/ru/result/2019-07-24
+<< http://www.msgr.ru/ru/result/2018-05-23
+<< http://www.msgr.ru/ru/result/2018-07-25-0
+<< http://www.msgr.ru/ru/result/2018-02-21
+<< http://www.msgr.ru/ru/result/2019-03-27
+<< http://www.msgr.ru/ru/result/2018-04-04
+<< http://www.msgr.ru/ru/result/2017-10-25
+<< http://www.msgr.ru/ru/result/2017-06-07
+<< http://www.msgr.ru/ru/result/2020-01-29
+<< http://www.msgr.ru/ru/result/2017-04-20
+<< http://www.msgr.ru/ru/result/2019-08-28
+<< http://www.msgr.ru/ru/result/2018-11-14
+<< http://www.msgr.ru/ru/result/2017-09-20
+<< http://www.msgr.ru/ru/result/2019-01-23
+<< http://www.msgr.ru/ru/result/2017-04-07
+<< http://www.msgr.ru/ru/result/2017-10-11
+<< http://www.msgr.ru/ru/result/2017-03-03
+<< http://www.msgr.ru/ru/result/2017-01-21
+<< http://www.msgr.ru/ru/result/2017-07-12
+<< http://www.msgr.ru/ru/result/2018-01-24
+<< http://www.msgr.ru/ru/result/2017-03-17
+<< http://www.msgr.ru/ru/result/2017-08-30
+<< http://www.msgr.ru/ru/result/2017-11-29
+<< http://www.msgr.ru/ru/result/2017-02-17-0
+<< http://www.msgr.ru/ru/result/2017-02-17
+2020-02-08 17:59:26 [scrapy.core.scraper] ERROR: Spider error processing <GET http://www.msgr.ru/ru/result/2017-02-17> (referer: http://www.msgr.ru/ru/results?items_per_page=All)
+Traceback (most recent call last):
+  File "/home/mid2/anaconda3/envs/scrapy/lib/python3.7/site-packages/twisted/internet/defer.py", line 654, in _runCallbacks
+    current.result = callback(current.result, *args, **kw)
+  File "msgr_parser.py", line 123, in parse_past_auctions
+    self.cur.execute(query, data)
+sqlite3.IntegrityError: UNIQUE constraint failed: past_auctions.date, past_auctions.adress
+<< http://www.msgr.ru/ru/result/2017-07-26
+<< http://www.msgr.ru/ru/result/2019-04-24
+<< http://www.msgr.ru/ru/result/2019-06-26
+<< http://www.msgr.ru/ru/result/2019-12-30
+<< http://www.msgr.ru/ru/result/2018-06-20
+<< http://www.msgr.ru/ru/result/2018-03-14
+<< http://www.msgr.ru/ru/result/2017-11-08
+<< http://www.msgr.ru/ru/result/2018-07-04
+<< http://www.msgr.ru/ru/result/2019-05-29
+<< http://www.msgr.ru/ru/result/2017-12-20
+<< http://www.msgr.ru/ru/result/2018-12-26
+<< http://www.msgr.ru/ru/result/2018-08-22
+<< http://www.msgr.ru/ru/result/2017-05-17
+<< http://www.msgr.ru/ru/result/2018-10-10
+<< http://www.msgr.ru/ru/result/2019-02-20
+<< http://www.msgr.ru/ru/result/2017-09-13
+<< http://www.msgr.ru/ru/result/2017-06-21
+<< http://www.msgr.ru/ru/result/2018-09-26
+<< http://www.msgr.ru/ru/result/2019-11-27
+<< http://www.msgr.ru/ru/result/2017-05-31
+<< http://www.msgr.ru/ru/result/2017-08-09
+<< http://www.msgr.ru/ru/result/2019-10-30
+<< http://www.msgr.ru/ru/result/2019-09-25
+Read data from db/2020-02-08_145917.db...
+Prepare data...
+Create .xlsx file...
+Create .csv for Yandex map...
+End.
