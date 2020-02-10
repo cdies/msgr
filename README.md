@@ -1,7 +1,7 @@
 <h1>Парсер для www.msgr.ru (МосСоцГарантия)</h1>
 <p>&nbsp;</p>
 <p>Зависимости:</p>
-<p>Anaconda python 3, scrapy</p>
+<p>Anaconda python 3, scrapy, yfinance</p>
 <p>&nbsp;</p>
 <p>1 Запуск парсера: <b>python3 msgr_parser.py</b></p>
 <p>2 Формирование отчёта и координат для Yandex карт: <b>python3 report.py</b></p>
