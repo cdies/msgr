@@ -1,5 +1,8 @@
 <h1>Парсер для www.msgr.ru (МосСоцГарантия)</h1>
 <p>&nbsp;</p>
+<p>Описание:</p>
+<p>https://habr.com/ru/post/487370/</p>
+<p>&nbsp;</p>
 <p>Зависимости:</p>
 <p>Anaconda python 3, scrapy, yfinance</p>
 <p>&nbsp;</p>
