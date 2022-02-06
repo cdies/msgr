@@ -197,6 +197,36 @@ def make_yandex_map(auctions, past_auctions, file_out='yandex.map.csv'):
 
 
 
+def to_float(text):
+    t = text.replace(',', '.')
+    # удаляй выражения в скобках
+    text = re.sub(r'\([^()]*\)', '', t).strip()  
+    if text == '':
+        # выбирай выражение в скобках
+        text = re.search(r'\([^()]*\)', t).group(0)[1:-1].strip() 
+
+    return float(text)
+
+
+def delete_usless_data(df):
+    # Удалим комнаты, нужны только квартиры
+    del_rooms = df['adress'].apply(lambda x: True if 'комнат' not in x else False)
+    df = df[del_rooms]
+
+    # Удалим доли также
+    parts = df['adress'].apply(lambda x: True if 'доля' not in x else False)
+    df = df[parts]
+
+
+    parts = df['adress'].apply(lambda x: True if 'поселение' not in x else False)
+    df = df[parts]
+
+    # # Оставляй только однушки
+    # df = df[df['rooms'] == 1]
+
+    return df
+
+
 def main():   
     files = os.listdir(path='db')
     if len(files) == 0:
@@ -212,15 +242,6 @@ def main():
 
 
     logging('Prepare data...')
-    def to_float(text):
-        t = text.replace(',', '.')
-        # удаляй выражения в скобках
-        text = re.sub(r'\([^()]*\)', '', t).strip()  
-        if text == '':
-            # выбирай выражение в скобках
-            text = re.search(r'\([^()]*\)', t).group(0)[1:-1].strip() 
-
-        return float(text)
     
     auctions['date'] = auctions['date'].apply(lambda x: datetime.strptime(x[:10], '%d.%m.%Y').date())
     auctions['adress'] = auctions['adress'].apply(lambda x: re.sub(r'\s+', '', x.lower()))
@@ -240,16 +261,21 @@ def main():
     past_auctions['final_price'] = past_auctions['final_price'].apply(lambda x: int(x) if x.isdigit() else 0)
 
 
+    # Удаляй комнаты и доли
+    auctions = delete_usless_data(auctions)
+    past_auctions = delete_usless_data(past_auctions)
+
+
     # Последние десять дней.
-    # date = auctions['date'].tolist() + past_auctions['date'].tolist()
-    # date = np.unique(date)
-    # past_auctions = past_auctions[past_auctions['date'].isin(date[-10:])]
+    date = auctions['date'].tolist() + past_auctions['date'].tolist()
+    date = np.unique(date)
+    past_auctions = past_auctions[past_auctions['date'].isin(date[-10:])]
 
     logging('Create .xlsx file...')
     make_xlsx_report(auctions, past_auctions)
 
-    logging('Create .csv for Yandex map...')
-    make_yandex_map(auctions, past_auctions)
+    # logging('Create .csv for Yandex map...')
+    # make_yandex_map(auctions, past_auctions)
 
     logging('End.')
         

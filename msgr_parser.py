@@ -59,7 +59,7 @@ class MsgrSpider(scrapy.Spider):
     def parse(self, response):
         # ссылки на страницы с данными об аукционах
         auctions = response.xpath('//nav[@id="block-category"]/ul/li/a/@href').extract()
-        auctions = set([i for i in auctions if 'auction' in i])
+        auctions = set(['http://www.msgr.ru' + i for i in auctions if 'auction' in i])
 
         # ссылки на страницы с данными об прошедших аукционах
         past_auctions = response.xpath('//div[@class="views-element-container"]//div[@class="view-content"]//a/@href').extract()
@@ -114,9 +114,14 @@ class MsgrSpider(scrapy.Spider):
             address = self.make_text(td[1])
             rooms = self.make_text(td[2])
             square = self.make_text(td[3])
-            livig_space = self.make_text(td[4])
-            begin_price = re.sub(r'\s+', '', self.make_text(td[5]))
-            final_price = re.sub(r'\s+', '', self.make_text(td[6]))
+            if len(td) == 7: # старый формат до 2021-03-03
+                livig_space = self.make_text(td[4])
+                begin_price = re.sub(r'\s+', '', self.make_text(td[5]))
+                final_price = re.sub(r'\s+', '', self.make_text(td[6]))
+            else:
+                livig_space = square
+                begin_price = re.sub(r'\s+', '', self.make_text(td[4]))
+                final_price = re.sub(r'\s+', '', self.make_text(td[5])) 
 
             data = (date, address, rooms, square, livig_space, begin_price, final_price)
 
