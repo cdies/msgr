@@ -12,16 +12,16 @@
 
 ***
 
-<p>Для работы report.py необходимо ваш yandex api ключ записать в файл yandex.key.txt (https://yandex.ru/blog/mapsapi/novye-pravila-dostupa-k-api-kart)</p>
-<p>И раскомментировать соответствующий код в report.py в самом конце, где вызывается функция `make_yandex_map(auctions, past_auctions)`</p>
+<p>Если нужна карта:</p>
+<p>1. Необходимо ваш yandex api ключ записать в файл <b>yandex.key.txt</b> (https://yandex.ru/blog/mapsapi/novye-pravila-dostupa-k-api-kart)</p>
+<p>2. Раскомментировать соответствующий код в <b>report.py</b> в самом конце, где вызывается функция <code>make_yandex_map(auctions, past_auctions)</code></p>
+<p>3. Координаты после выполнения <b>report.py</b> находятся в файле <b>yandex.map.csv</b>, их нужно загрузить на https://yandex.ru/map-constructor/</p>
 
 <p>&nbsp;</p>
 
-<p>Координаты после выполнения report.py находятся в файле yandex.map.csv, их нужно загрузить на https://yandex.ru/map-constructor/</p>
+***
 
-<p>&nbsp;</p>
-
-<p>Гистограммы находятся в файле statistics.ipynb</p>
+<p>Гистограммы находятся в файле <b>statistics.ipynb</b></p>
 <p>&nbsp;</p>
 
 
