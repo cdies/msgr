@@ -4,21 +4,21 @@ import scrapy
 from scrapy.http import Request
 from scrapy.crawler import CrawlerProcess
 from scrapy.utils.project import get_project_settings
+from scrapy.selector import Selector
 import sqlite3
 import os
 import time
 import re
+import requests
 
 # класс скачивает ссылки на все аукцоны из msgr.ru и сохраняет в бд sqlite3
 class MsgrSpider(scrapy.Spider):
     name = 'msgr_parser'
     allowed_domains = ['msgr.ru']
+    start_urls = ["http://msgr.ru/ru/results?items_per_page=50&page=0"]
 
-    def __init__(self, db_connect, start_url):
+    def __init__(self, db_connect):
         self.logging('######## start msgr.ru ########') 
-
-        # http://www.msgr.ru/ru/results?items_per_page=All
-        self.start_urls = [start_url]
 
         con = sqlite3.connect(db_connect)
         cur = con.cursor()
@@ -56,14 +56,29 @@ class MsgrSpider(scrapy.Spider):
         self.con = con
         
         
-    def parse(self, response):
+    def parse(self, selector):
+        items_per_page = 50
+        number_page = 1
+        page = 'http://msgr.ru/ru/results?items_per_page={}&page={}'
+
         # ссылки на страницы с данными об аукционах
-        auctions = response.xpath('//nav[@id="block-category"]/ul/li/a/@href').extract()
+        auctions = selector.xpath('//nav[@id="block-category"]/ul/li/a/@href').extract()
         auctions = set(['http://www.msgr.ru' + i for i in auctions if 'auction' in i])
 
         # ссылки на страницы с данными об прошедших аукционах
-        past_auctions = response.xpath('//div[@class="views-element-container"]//div[@class="view-content"]//a/@href').extract()
-        past_auctions = set(['http://www.msgr.ru' + i for i in past_auctions])
+        past_auctions = []
+        while True:
+            time.sleep(0.2)
+            tmp = selector.xpath('//div[@class="views-element-container"]//div[@class="view-content"]//a/@href').extract()
+            if len(tmp) == 0:
+                break 
+
+            past_auctions += ['http://www.msgr.ru' + i for i in tmp]
+            number_page += 1
+            r = requests.get(page.format(items_per_page, number_page))
+            selector = Selector(text=r.text)
+
+        past_auctions = set(past_auctions)
 
 
         for page in auctions:
@@ -157,7 +172,6 @@ def main():
         os.makedirs('db')
 
     db_connect = 'db/' +  time.strftime('%Y-%m-%d_%H%M%S', time.gmtime()) + '.db'
-    start_url = 'http://www.msgr.ru/ru/results?items_per_page=All'
         
     settings = get_project_settings()
     settings['RETRY_TIMES'] = 5
@@ -166,7 +180,7 @@ def main():
     settings['LOG_FILE'] = 'logs.txt'
 
     process = CrawlerProcess(settings)
-    process.crawl(MsgrSpider, db_connect=db_connect, start_url=start_url)
+    process.crawl(MsgrSpider, db_connect=db_connect)
     process.start()
 
 if __name__ == "__main__":
