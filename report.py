@@ -103,28 +103,28 @@ def geocoder(addr, key):
     return lon, lat
 
 
+def make_adress(addr, room, sq):
+    addr = addr.replace('(реновация)', '')
+    temp = addr.split('кв.')
+            
+    if len(temp) == 2:
+        addr, temp = temp
+    else:
+        try:
+            # выбирай выражение в скобках
+            addr = re.search(r'\([^()]*\)', addr).group(0)[1:-1]
+        except:
+            pass
+        temp = addr.split('кв.')
+        addr = temp[0]
+        temp = temp[1]
+                
+    return '{}_{}_ком., пл. {}, кв. {}'.format(addr, room, sq, temp)
 
-def make_yandex_map(auctions, past_auctions, file_out='yandex.map.csv'):
+
+def make_yandex_map_full(auctions, past_auctions, file_out='yandex.map.csv'):
     date = auctions['date'].tolist() + past_auctions['date'].tolist()
     date = np.unique(date)
-
-    def make_adress(addr, room, sq):
-        addr = addr.replace('(реновация)', '')
-        temp = addr.split('кв.')
-                
-        if len(temp) == 2:
-            addr, temp = temp
-        else:
-            try:
-                # выбирай выражение в скобках
-                addr = re.search(r'\([^()]*\)', addr).group(0)[1:-1]
-            except:
-                pass
-            temp = addr.split('кв.')
-            addr = temp[0]
-            temp = temp[1]
-                    
-        return '{}_{}_ком., пл. {}, кв. {}'.format(addr, room, sq, temp)
         
     # Добавление данных к адресу
     auctions['adress_data'] = auctions.apply(lambda x: 
@@ -182,6 +182,63 @@ def make_yandex_map(auctions, past_auctions, file_out='yandex.map.csv'):
             l = '{:,}'.format(temp[-1][1]).replace(',', '.') + ', {}, {}'.format(temp.index[-1].year, temp.size)
         else:
             l = '{}, {}, {}'.format(temp[-1][1], temp.index[-1].year, temp.size)
+        label.append(l)
+        
+        # Количество квартир
+        placemark_number.append(room)
+        
+    sub = pd.DataFrame({'Latitude':latitude, 
+                        'Longitude':longitude,
+                        'Description':description, 
+                        'Label':label,
+                        'Placemark number':placemark_number})
+
+    sub.to_csv(file_out, index=False)
+
+
+def make_yandex_map(auctions, file_out='yandex.map.csv'):
+    date = auctions['date'].tolist()
+    date = np.unique(date)
+        
+    # Добавление данных к адресу
+    auctions['adress_data'] = auctions.apply(lambda x: 
+        make_adress(x['adress'], x['rooms'], x['square']), axis=1)
+
+    adress = auctions['adress_data'].tolist() #+ past_auctions['adress_data'].tolist()
+    adress = np.unique(adress)
+
+    df = pd.DataFrame(index=adress,columns=date)
+        
+    for _, row in auctions.iterrows():
+        date = row['date']
+        adress = row['adress_data']
+        df.loc[adress, date] = row['price']
+
+
+    # Формирование адресов для Яндекс карт
+    df_T = df.T
+
+    latitude, longitude, description, label, placemark_number = [],[],[],[],[]
+
+    with open('yandex.key.txt', 'r') as f:
+        key = f.read()
+
+    for col in tqdm(df_T.columns):
+        addr, room, other_data = col.split('_')
+
+        # Долгота и широта из адресса
+        lon, lat = geocoder(addr, key)
+        
+        latitude.append(lat)
+        longitude.append(lon)
+
+        # Описание
+        temp = df_T.loc[df_T[col].isna()==False, col]       
+        d = '<p>' + addr + room + other_data + '</p>'
+        description.append(d)
+                
+        # Заголовок (дата аукциона, цена)
+        l = '{} | {:,}'.format(temp.index.values[0], temp[0])
         label.append(l)
         
         # Количество квартир
@@ -269,13 +326,17 @@ def main():
     # Последние десять дней.
     date = auctions['date'].tolist() + past_auctions['date'].tolist()
     date = np.unique(date)
-    past_auctions = past_auctions[past_auctions['date'].isin(date[-10:])]
+    past_auctions = past_auctions[past_auctions['date'].isin(date[-20:])]
+
+    # auctions = auctions[auctions['rooms'] == 1]
+    # past_auctions = past_auctions[past_auctions['rooms'] == 1]
 
     logging('Create .xlsx file...')
     make_xlsx_report(auctions, past_auctions)
 
     # logging('Create .csv for Yandex map...')
-    # make_yandex_map(auctions, past_auctions)
+    # make_yandex_map(auctions)
+    # make_yandex_map_full(auctions, past_auctions)
 
     logging('End.')
         
