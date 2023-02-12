@@ -202,9 +202,10 @@ def make_yandex_map(auctions, file_out='yandex.map.csv'):
         
     # Добавление данных к адресу
     auctions['adress_data'] = auctions.apply(lambda x: 
-        make_adress(x['adress'], x['rooms'], x['square']), axis=1)
+        make_adress(x['adress'], x['rooms'], x['square']), 
+        axis=1) + '<p>' + auctions['link'] + '</p>'
 
-    adress = auctions['adress_data'].tolist() #+ past_auctions['adress_data'].tolist()
+    adress = auctions['adress_data'].tolist()
     adress = np.unique(adress)
 
     df = pd.DataFrame(index=adress,columns=date)
