@@ -122,7 +122,7 @@ def make_adress(addr, room, sq):
     return '{}_{}_ком., пл. {}, кв. {}'.format(addr, room, sq, temp)
 
 
-def make_yandex_map_full(auctions, past_auctions, file_out='yandex.map.csv'):
+def make_yandex_map_full(auctions, past_auctions, file_out='yandex.map.full.csv'):
     date = auctions['date'].tolist() + past_auctions['date'].tolist()
     date = np.unique(date)
         
