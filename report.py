@@ -327,7 +327,7 @@ def main():
     # Последние десять дней.
     date = auctions['date'].tolist() + past_auctions['date'].tolist()
     date = np.unique(date)
-    past_auctions = past_auctions[past_auctions['date'].isin(date[-20:])]
+    past_auctions = past_auctions[past_auctions['date'].isin(date[-10:])]
 
     # auctions = auctions[auctions['rooms'] == 1]
     # past_auctions = past_auctions[past_auctions['rooms'] == 1]
