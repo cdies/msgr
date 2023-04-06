@@ -122,7 +122,10 @@ def make_adress(addr, room, sq):
     return '{}_{}_ком., пл. {}, кв. {}'.format(addr, room, sq, temp)
 
 
-def make_yandex_map_full(auctions, past_auctions, file_out='yandex.map.full.csv'):
+def make_yandex_map_full(auctions, past_auctions, auctions_only=False, file_out='yandex.map.full.csv'):
+    if auctions_only:
+        past_auctions = past_auctions[past_auctions['adress'].isin(auctions['adress'].unique())]
+
     date = auctions['date'].tolist() + past_auctions['date'].tolist()
     date = np.unique(date)
         
@@ -176,14 +179,19 @@ def make_yandex_map_full(auctions, past_auctions, file_out='yandex.map.full.csv'
             d += '<div>{}: {} | {}</div>'.format(temp.index[i], temp[i][0], temp[i][1])
         d += '<p>' + addr + room + other_data + '</p>'
         description.append(d)
-                
-        # Заголовок (цена продажи, дата продажи, с какого раза продано)
-        if type(temp[-1][1]) == int:
-            l = '{:,}'.format(temp[-1][1]).replace(',', '.') + ', {}, {}'.format(temp.index[-1].year, temp.size)
+
+        if auctions_only:
+            # Заголовок (дата аукциона, цена)
+            l = '{} | {:,}'.format(temp.index.values[-1], temp[-1][0])
+            label.append(l)
         else:
-            l = '{}, {}, {}'.format(temp[-1][1], temp.index[-1].year, temp.size)
-        label.append(l)
-        
+            # Заголовок (цена продажи, дата продажи, с какого раза продано)
+            if type(temp[-1][1]) == int:
+                l = '{:,}'.format(temp[-1][1]).replace(',', '.') + ', {}, {}'.format(temp.index[-1].year, temp.size)
+            else:
+                l = '{}, {}, {}'.format(temp[-1][1], temp.index[-1].year, temp.size)
+            label.append(l)
+            
         # Количество квартир
         placemark_number.append(room)
         
@@ -327,17 +335,17 @@ def main():
     # Последние десять дней.
     date = auctions['date'].tolist() + past_auctions['date'].tolist()
     date = np.unique(date)
-    past_auctions = past_auctions[past_auctions['date'].isin(date[-10:])]
+    past_auctions = past_auctions[past_auctions['date'].isin(date[-20:])]
 
-    # auctions = auctions[auctions['rooms'] == 1]
-    # past_auctions = past_auctions[past_auctions['rooms'] == 1]
+    auctions = auctions[auctions['rooms'].isin((1,2))]
+    past_auctions = past_auctions[past_auctions['rooms'].isin((1,2))]
 
     logging('Create .xlsx file...')
     make_xlsx_report(auctions, past_auctions)
 
-    # logging('Create .csv for Yandex map...')
+    logging('Create .csv for Yandex map...')
     # make_yandex_map(auctions)
-    # make_yandex_map_full(auctions, past_auctions)
+    make_yandex_map_full(auctions, past_auctions, auctions_only=True)
 
     logging('End.')
         
